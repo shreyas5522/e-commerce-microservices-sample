@@ -43,10 +43,10 @@ const Deals = () => {
       const normalized: Deal[] =
         Array.isArray(payload)
           ? payload
-          : Array.isArray(payload?.items)
-          ? payload.items
-          : Array.isArray(payload?.data)
-          ? payload.data
+          : Array.isArray((payload as any)?.items)
+          ? (payload as any).items
+          : Array.isArray((payload as any)?.data)
+          ? (payload as any).data
           : toArray<Deal>(payload);
 
       setDeals(normalized);
@@ -65,60 +65,75 @@ const Deals = () => {
 
   return (
     <Paper elevation={3} sx={{ pl: 2, pb: 2 }}>
-      <Typography variant="h6" sx={{ p: 1, color: 'text.primary' }}>
-        Deals of the Day
-      </Typography>
-
-      {loading && (
-        <Typography sx={{ px: 2, pb: 2 }} color="text.secondary">
-          Loading deals…
+      <>
+        <Typography variant="h6" sx={{ p: 1, color: 'text.primary' }}>
+          Deals of the Day
         </Typography>
-      )}
 
-      {error && !loading && (
-        <Typography sx={{ px: 2, pb: 2 }} color="error">
-          Failed to load deals.
-        </Typography>
-      )}
+        {loading && (
+          <Typography sx={{ px: 2, pb: 2 }} color="text.secondary">
+            Loading deals…
+          </Typography>
+        )}
 
-      <Grid container spacing={2}>
-        {deals.slice(0, 5).map((deal) => (
-          <Grid item key={deal.dealId ?? deal.variantSku}>
-            <Link
-              component="button"
-              onClick={() => {
-                navigate('product/' + deal.variantSku);
-              }}
-              underline="none"
-            >
-              <Card sx={{ width: 250, height: 290 }}>
-                <Box>
-                  <img src={deal.thumbnail} height={150} alt={deal.name} />
-                </Box>
-                <CardContent sx={{ height: 50 }}>
-                  <Grid container>
-                    <Grid item xs={12}>
-                      <Typography color="text.secondary">
-                        {deal.shortDescription}
-                      </Typography>
+        {error && !loading && (
+          <Typography sx={{ px: 2, pb: 2 }} color="error">
+            Failed to load deals.
+          </Typography>
+        )}
+
+        <Grid container spacing={2}>
+          {deals.slice(0, 5).map((deal) => (
+            <Grid item key={deal.dealId ?? deal.variantSku}>
+              <Link
+                component="button"
+                onClick={() => {
+                  // Use absolute path to avoid relative route issues
+                  navigate(`/product/${deal.variantSku}`);
+                }}
+                underline="none"
+              >
+                <Card sx={{ width: 250, height: 290 }}>
+                  <Box>
+                    <img src={deal.thumbnail} height={150} alt={deal.name} />
+                  </Box>
+                  <CardContent sx={{ height: 50 }}>
+                    <Grid container>
+                      <Grid item xs={12}>
+                        <Typography color="text.secondary">
+                          {deal.shortDescription}
+                        </Typography>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </CardContent>
-                <CardActions>
-                  <Grid container>
-                    <Grid item xs={6} sx={{ p: 1, display: 'flex', justifyContent: 'flex-start' }}>
-                      <Typography variant="h6">$ {deal.price}</Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Grid container>
+                      <Grid
+                        item
+                        xs={6}
+                        sx={{ p: 1, display: 'flex', justifyContent: 'flex-start' }}
+                      >
+                        <Typography variant="h6">$ {deal.price}</Typography>
+                      </Grid>
+                      <Grid
+                        item
+                        xs={6}
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'flex-end',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Chip icon={<StarIcon />} label={deal.rating} />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                      <Chip icon={<StarIcon />} label={deal.rating} />
-                    </Grid>
-                  </Grid>
-                </CardActions>
-              </Card>
-            </Link>
-          </Grid>
-        ))}
-      </Grid>
+                  </CardActions>
+                </Card>
+              </Link>
+            </Grid>
+          ))}
+        </Grid>
+      </>
     </Paper>
   );
 };
